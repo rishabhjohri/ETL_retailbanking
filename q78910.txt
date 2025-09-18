@@ -1,0 +1,54 @@
+from pyspark.sql.window import Window
+from pyspark.sql.functions import sum as _sum
+
+# Define window
+txn_window = Window.partitionBy("account_id").orderBy("txn_date") \
+    .rowsBetween(Window.unboundedPreceding, Window.currentRow)
+
+# Add running total column
+Bank_FullData = Bank_FullData.withColumn("running_total", _sum("txn_amount").over(txn_window))
+
+print("Q7: Running Total of Transactions Per Account")
+Bank_FullData.select("account_id", "txn_id", "txn_date", "txn_amount", "running_total") \
+    .orderBy("account_id", "txn_date") \
+    .show(10, truncate=False)
+----------------------------------------
+from pyspark.sql.functions import year
+
+# Filter accounts opened in 2018
+accounts_2018 = account_df.filter(year("open_date") == 2018)
+
+# Count unique customers who opened in 2018
+unique_2018_customers = accounts_2018.select("customer_id").distinct()
+
+# Join with customer data to check status in 2021
+# Assume "active_status" reflects 2021
+active_in_2021 = unique_2018_customers.join(customer_df, "customer_id") \
+    .filter(col("active_status") == "Active")
+
+# Display counts
+print("Q8:")
+print("→ Total unique customers opened accounts in 2018:", unique_2018_customers.count())
+print("→ Of those, still active in 2021:", active_in_2021.count())
+---------------------------------------------------
+from pyspark.sql.functions import avg
+
+# Filter for 2020 transactions
+txn_2020 = Bank_FullData.filter(year("txn_date") == 2020)
+
+# Group by branch and calculate average transaction amount
+branch_avg_2020 = txn_2020.groupBy("branch_id", "branch_name") \
+    .agg(avg("txn_amount").alias("avg_txn_amount")) \
+    .orderBy(col("avg_txn_amount").desc()) \
+    .limit(3)
+
+print("Q9: Top 3 Branches with Highest Average Transaction Amount in 2020")
+branch_avg_2020.show()
+
+---------------------------------
+# Save to JSON (overwrite if already exists)
+branch_avg_2020.write.mode("overwrite").json("branch_avg_txn_2020.json")
+
+print("Q10: File 'branch_avg_txn_2020.json' has been written successfully.")
+
+
