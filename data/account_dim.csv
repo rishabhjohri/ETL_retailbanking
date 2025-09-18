@@ -1,0 +1,6 @@
+account_id,customer_id,account_type,open_date,is_active
+A001,C001,Savings,2017-03-01,Yes
+A002,C002,Current,2018-05-11,No
+A003,C003,Savings,2018-11-15,Yes
+A004,C004,Current,2016-01-25,Yes
+A005,C005,Savings,2019-06-30,Yes

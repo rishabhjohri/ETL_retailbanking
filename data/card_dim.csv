@@ -1,0 +1,6 @@
+card_id,card_type,issued_to_customer_id
+CD001,Credit,C001
+CD002,Debit,C001
+CD003,Credit,C003
+CD004,Credit,C004
+CD005,Debit,C005
