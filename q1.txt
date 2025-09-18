@@ -1,0 +1,37 @@
+from pyspark.sql import SparkSession
+
+# Initialize SparkSession
+spark = SparkSession.builder \
+    .appName("RetailBankingCaseStudy") \
+    .getOrCreate()
+
+# Set file paths (update if needed)
+base_path = "bank_toy_data/"  # change to full path if files aren't in current working directory
+customer_path = base_path + "customer_dim.csv"
+account_path = base_path + "account_dim.csv"
+transaction_path = base_path + "transaction_fact.csv"
+branch_path = base_path + "branch_dim.csv"
+card_path = base_path + "card_dim.csv"
+
+# Load CSV files into DataFrames
+customer_df = spark.read.option("header", "true").csv(customer_path)
+account_df = spark.read.option("header", "true").csv(account_path)
+transaction_df = spark.read.option("header", "true").csv(transaction_path)
+branch_df = spark.read.option("header", "true").csv(branch_path)
+card_df = spark.read.option("header", "true").csv(card_path)
+
+# Print schemas
+print("Customer DataFrame Schema:")
+customer_df.printSchema()
+
+print("Account DataFrame Schema:")
+account_df.printSchema()
+
+print("Transaction DataFrame Schema:")
+transaction_df.printSchema()
+
+print("Branch DataFrame Schema:")
+branch_df.printSchema()
+
+print("Card DataFrame Schema:")
+card_df.printSchema()
