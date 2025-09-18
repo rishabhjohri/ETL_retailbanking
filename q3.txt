@@ -1,0 +1,12 @@
+from pyspark.sql.functions import to_date
+
+# Convert txn_date to DateType
+Bank_FullData = Bank_FullData.withColumn("txn_date", to_date(col("txn_date"), "yyyy-MM-dd"))
+
+# Print schema to confirm
+print("Updated Schema after txn_date conversion:")
+Bank_FullData.printSchema()
+
+# Display top 5 records
+print("Top 5 Records with Converted txn_date:")
+Bank_FullData.select("txn_id", "txn_amount", "txn_type", "txn_date").show(5, truncate=False)
