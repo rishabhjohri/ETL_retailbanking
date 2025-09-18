@@ -1,0 +1,25 @@
+from pyspark.sql.functions import col
+
+# Join customer and account
+cust_acc_df = customer_df.join(account_df, on="customer_id", how="inner")
+
+# Join with transaction_fact on account_id
+cust_acc_txn_df = cust_acc_df.join(transaction_df, on="account_id", how="inner")
+
+# Join with card_dim on card_id
+cust_acc_txn_card_df = cust_acc_txn_df.join(card_df, on="card_id", how="left")
+
+# Join with branch_dim using city as proxy (from customer_dim and branch_dim)
+# To avoid duplicate "city" column, alias one before join
+branch_df_renamed = branch_df.withColumnRenamed("city", "branch_city")
+final_df = cust_acc_txn_card_df.join(branch_df_renamed, cust_acc_txn_card_df["city"] == branch_df_renamed["branch_city"], "left")
+
+# Drop duplicate columns (e.g., branch_city, redundant city)
+Bank_FullData = final_df.drop("branch_city")
+
+# Show final schema and sample rows
+print("Bank_FullData Schema:")
+Bank_FullData.printSchema()
+
+print("Bank_FullData Sample Rows:")
+Bank_FullData.show(5, truncate=False)
