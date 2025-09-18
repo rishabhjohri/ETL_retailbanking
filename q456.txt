@@ -1,0 +1,37 @@
+from pyspark.sql.functions import sum as _sum
+
+top5_customers = Bank_FullData.groupBy("customer_id", "name") \
+    .agg(_sum("txn_amount").alias("total_txn_amount")) \
+    .orderBy(col("total_txn_amount").desc()) \
+    .limit(5)
+
+print("Q4: Top 5 Customers by Total Transaction Amount")
+top5_customers.show()
+
+---------------------------------------------------
+
+from pyspark.sql.functions import date_format
+
+Bank_FullData = Bank_FullData.withColumn("Transaction_YearMonth", date_format(col("txn_date"), "yyyy-MM"))
+
+print("Q5: First 10 rows with Transaction_YearMonth")
+Bank_FullData.select("txn_id", "txn_date", "Transaction_YearMonth").show(10, truncate=False)
+
+-------------------------------------------------------------------
+from pyspark.sql.functions import count
+
+# Filter credit card transactions
+credit_txns = Bank_FullData.filter(col("card_type") == "Credit")
+
+# Count transactions per customer
+credit_txn_counts = credit_txns.groupBy("issued_to_customer_id") \
+    .agg(count("*").alias("credit_card_txn_count")) \
+    .orderBy(col("credit_card_txn_count").desc()) \
+    .limit(1)
+
+# Join with customer data to get name
+max_credit_customer = credit_txn_counts.join(customer_df, credit_txn_counts["issued_to_customer_id"] == customer_df["customer_id"], "left") \
+    .select("issued_to_customer_id", "name", "credit_card_txn_count")
+
+print("Q6: Customer with Most Credit Card Transactions")
+max_credit_customer.show()
